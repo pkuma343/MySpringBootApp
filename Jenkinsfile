@@ -40,11 +40,11 @@ pipeline {
             }
         }
         
-        stage('Container Security Scan') {
-            steps{
-                sh "trivy image --exit-code 1 --severity CRITICAL pkuma343/myimage:${env.BUILD_NUMBER}"
-            }
-        }
+//         stage('Container Security Scan') {
+//             steps{
+//                 sh "trivy image --exit-code 1 --severity CRITICAL pkuma343/myimage:${env.BUILD_NUMBER}"
+//             }
+//         }
 
         stage('Push Image') {
             steps {
