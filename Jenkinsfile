@@ -21,7 +21,16 @@ pipeline {
 
         stage('Sonar Scan') {
             steps {
-                sh 'mvn sonar:sonar -Dsonar.projectKey=demo -Dsonar.host.url=http://ip-172-31-6-130.us-east-2.compute.internal:9000 -Dsonar.login=cb62d433bf1846d579f2879a8f080c77d4755b42'
+                withSonarQubeEnv('sonar') {
+                    sh 'mvn sonar:sonar -Dsonar.projectKey=demo'
+                }
+            }
+        }
+        
+        stage('Quality Gate')
+            steps {
+                timeout(time: 1, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
             }
         }
 
