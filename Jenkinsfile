@@ -6,12 +6,6 @@ pipeline {
     }
     stages {
 
-        stage('Checkout SCM') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Maven Tests') {
             steps {
                 sh 'mvn clean test'
@@ -29,7 +23,7 @@ pipeline {
         
         stage('Quality Gate') {
             steps {
-                timeout(time: 1, unit: 'MINUTES') {
+                timeout(time: 30, unit: 'SECONDS') {
                     waitForQualityGate abortPipeline: true
                 }
             }
