@@ -36,17 +36,17 @@ pipeline {
                 sh "docker build -t pkuma343/myimage:${env.BUILD_NUMBER} -f Dockerfile ."
             }
         }
+        
+        stage('Container Security Scan') {
+            steps{
+                sh "trivy image --exit-code 1 --severity CRITICAL,HIGH pkuma343/myimage:${env.BUILD_NUMBER}"
+            }
+        }
 
         stage('Push Image') {
             steps {
                 sh 'docker login -u "pkuma343" -p "Password" || echo "Docker Login Failed"'
                 sh "docker push pkuma343/myimage:${env.BUILD_NUMBER} || echo 'Docker Push cannot be done!'"
-            }
-        }
-
-        stage('Deploy') {
-            steps{
-                sh 'echo "/path/to/kubectl apply -f api.yaml --kube-config=${PATH_TO_KUBE_CONFIG}"'
             }
         }
 
