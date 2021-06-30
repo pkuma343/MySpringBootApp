@@ -23,7 +23,7 @@ pipeline {
         
         stage('Quality Gate') {
             steps {
-                sleep(20);
+                sleep(5);
                 waitForQualityGate abortPipeline: true;
             }
         }
@@ -42,7 +42,7 @@ pipeline {
         
         stage('Container Security Scan') {
             steps{
-                sh "trivy image --exit-code 1 --severity CRITICAL,HIGH pkuma343/myimage:${env.BUILD_NUMBER}"
+                sh "trivy image --exit-code 1 --severity CRITICAL pkuma343/myimage:${env.BUILD_NUMBER}"
             }
         }
 
