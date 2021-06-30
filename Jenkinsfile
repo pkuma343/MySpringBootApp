@@ -23,7 +23,7 @@ pipeline {
         
         stage('Quality Gate') {
             steps {
-                sleep(1);
+                sleep(5);
                 waitForQualityGate abortPipeline: true;
             }
         }
