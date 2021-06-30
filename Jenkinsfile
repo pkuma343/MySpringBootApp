@@ -23,8 +23,9 @@ pipeline {
         
         stage('Quality Gate') {
             steps {
-                    waitForQualityGate abortPipeline: true
-                }
+                sleep(20);
+                waitForQualityGate abortPipeline: true;
+            }
         }
 
         stage('Maven Install') {
