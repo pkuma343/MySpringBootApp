@@ -45,6 +45,21 @@ pipeline {
             }
         }
 
+        stage('OWASP Scan and Publish') { 
+            steps {
+                dependencyCheck additionalArguments: 'dependency-check.sh --project "DevSecOps" --scan "/var/lib/jenkins/workspace/DevSecOps_CI_Pipeline/"', odcInstallation: 'OWASP_Dependency_Check'
+                dependencyCheckPublisher pattern: 'dependency-check-report.xml', failedTotalCritical: 3, unstableTotalCritical: 1
+                archiveArtifacts artifacts: 'dependency-check-report.*'
+                script {
+                    if (currentBuild.result == 'UNSTABLE') {
+                        unstable('UNSTABLE: Dependency check')
+                    } else if (currentBuild.result == 'FAILURE') {
+                        error('FAILED: Dependency check')
+                    }
+                }
+            }
+        }
+
         stage('Build Image') {
             steps {
                 sh "docker build -t yeskay16/devsecopsapp:${env.BUILD_NUMBER} -f Dockerfile ."
