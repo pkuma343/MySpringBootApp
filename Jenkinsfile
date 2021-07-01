@@ -23,7 +23,7 @@ pipeline {
         
         stage('Quality Gate') {
             steps {
-                sleep(5);
+                sleep(10);
                 waitForQualityGate abortPipeline: true;
             }
         }
@@ -34,22 +34,18 @@ pipeline {
             }
         }
 
-        stage('Docker build') {
+        stage('Build Image') {
             steps {
-                sh "docker build -t pkuma343/myimage:${env.BUILD_NUMBER} -f Dockerfile ."
+                sh "docker build -t yeskay16/app:${env.BUILD_NUMBER} -f Dockerfile ."
             }
         }
-        
-//         stage('Container Security Scan') {
-//             steps{
-//                 sh "trivy image --exit-code 1 --severity CRITICAL pkuma343/myimage:${env.BUILD_NUMBER}"
-//             }
-//         }
-
-        stage('Push Image') {
+	
+        stage('Publish Image') {
             steps {
-                sh 'docker login -u "pkuma343" -p "Password" || echo "Docker Login Failed"'
-                sh "docker push pkuma343/myimage:${env.BUILD_NUMBER} || echo 'Docker Push cannot be done!'"
+                withCredentials([usernamePassword(credentialsId: 'sk_dockerhub_creds', passwordVariable: 'PASS', usernameVariable: 'USER')])  {
+                    sh 'docker login --username ${USER} --password ${PASS}'
+                    sh "docker push yeskay16/app:${env.BUILD_NUMBER}"
+                }
             }
         }
 
