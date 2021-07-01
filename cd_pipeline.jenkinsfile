@@ -1,0 +1,56 @@
+pipeline {
+    agent any 
+
+    environment { 
+        CI_BUILD_NUMBER= sh (returnStdout: true, script: 'echo $(curl -s ${JENKINS_URL}job/DevSecOps_CI_Pipeline/lastSuccessfulBuild/buildNumber)').trim()
+    }
+    
+    stages {
+	
+        stage('OWASP Scan and Publish') { 
+            steps {
+                dependencyCheck additionalArguments: 'dependency-check.sh --project "DevSecOps" --scan "/var/lib/jenkins/workspace/DevSecOps_CI_Pipeline/"', odcInstallation: 'OWASP_Dependency_Check'
+                dependencyCheckPublisher pattern: 'dependency-check-report.xml', failedTotalCritical: 3, unstableTotalCritical: 1
+                archiveArtifacts artifacts: 'dependency-check-report.*'
+                script {
+                    if (currentBuild.result == 'UNSTABLE') {
+                        unstable('UNSTABLE: Dependency check')
+                    } else if (currentBuild.result == 'FAILURE') {
+                        error('FAILED: Dependency check')
+                    }
+                }
+            }
+        }
+
+        stage('Connect Docker Registry') { 
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'sk_dockerhub_creds', passwordVariable: 'PASS', usernameVariable: 'USER')])  {
+                    sh 'docker login --username ${USER} --password ${PASS}'
+                    sh 'docker pull yeskay16/devsecopsapp:$CI_BUILD_NUMBER'
+                }
+            }	
+        }	
+
+        stage('Docker Image Trivy Scan') { 
+            steps {
+                // sh "trivy image --exit-code 1 --severity CRITICAL pkuma343/myimage:${env.BUILD_NUMBER}"		
+                sh "trivy image --exit-code 0 yeskay16/devsecopsapp:$CI_BUILD_NUMBER"
+            }
+        }
+
+        stage('Application Deploy') {
+            steps {
+                sh 'docker run --rm -d -p 8000:8080 --name Spring_Boot_App yeskay16/devsecopsapp:$CI_BUILD_NUMBER'
+            }
+        }
+
+        stage('Sanity Check') { 
+            steps {
+                sleep(10);
+                sh 'curl -s -o /dev/null -w "%{http_code}" localhost:8000/users/1000/userinfo || echo "API FAILURE: Status Code is not 200 OK!"'
+                sh 'docker stop Spring_Boot_App'
+                sh 'docker rmi -f yeskay16/devsecopsapp:$CI_BUILD_NUMBER'
+            }
+        }
+    }
+}
