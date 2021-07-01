@@ -6,6 +6,12 @@ pipeline {
     }
     stages {
 
+       stage('Checkout SCM') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Maven Tests') {
             steps {
                 sh 'mvn clean test'
