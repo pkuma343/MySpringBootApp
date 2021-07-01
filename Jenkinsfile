@@ -1,8 +1,13 @@
 pipeline {
     agent any
+
     tools {
         jdk "jdk11"
         maven "mvn"
+    }
+
+    options {
+        skipDefaultCheckout(true)
     }
     stages {
 
@@ -42,7 +47,7 @@ pipeline {
 
         stage('Build Image') {
             steps {
-                sh "docker build -t yeskay16/app:${env.BUILD_NUMBER} -f Dockerfile ."
+                sh "docker build -t yeskay16/devsecopsapp:${env.BUILD_NUMBER} -f Dockerfile ."
             }
         }
 	
@@ -50,7 +55,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'sk_dockerhub_creds', passwordVariable: 'PASS', usernameVariable: 'USER')])  {
                     sh 'docker login --username ${USER} --password ${PASS}'
-                    sh "docker push yeskay16/app:${env.BUILD_NUMBER}"
+                    sh "docker push yeskay16/devsecopsapp:${env.BUILD_NUMBER}"
                 }
             }
         }
