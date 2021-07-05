@@ -44,8 +44,8 @@ pipeline {
                 //sh 'if [[ 1 < $(grep -o -i "<riskcode>2</riskcode>" report.xml | wc -l) ]]; then echo "Medium Risk"; fi;'
                 
                 script {
-                    ZAP_MEDIUM = sh (script: 'grep -o -i "<riskcode>2</riskcode>" report.xml | wc -l', returnStdout: true).trim()
-                    ZAP_HIGH = sh (script: 'grep -o -i "<riskcode>3</riskcode>" report.xml | wc -l', returnStdout: true).trim()
+                    ZAP_MEDIUM = sh (script: 'grep -o -i "<riskcode>2</riskcode>" ZAP.xml | wc -l', returnStdout: true).trim()
+                    ZAP_HIGH = sh (script: 'grep -o -i "<riskcode>3</riskcode>" ZAP.xml | wc -l', returnStdout: true).trim()
                     if (ZAP_MEDIUM > 0) {
                         error('FAILED: ZAP found ${ZAP_HIGH} High Risk(s) in app')
                     } else if (ZAP_MEDIUM > 0) {
