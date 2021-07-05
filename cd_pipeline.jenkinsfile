@@ -39,7 +39,7 @@ pipeline {
         stage('OWASP ZAP Scan') { 
             steps {
                 sh 'docker run --rm -t --net=ci-dev --hostname zap --name zap owasp/zap2docker-bare:latest zap.sh -cmd -quickurl http://app:8000/users/1000/userinfo > ZAP.xml'
-                sh 'sed -i 1,12d ZAP.xml'
+                //sh 'sed -i 1,12d ZAP.xml'
                 archiveArtifacts artifacts: 'ZAP.xml'
             }
         }
