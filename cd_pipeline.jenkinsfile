@@ -38,7 +38,7 @@ pipeline {
     
         stage('OWASP ZAP Scan') { 
             steps {
-                sh 'docker run --rm -ti --net=ci-dev --hostname zap --name zap owasp/zap2docker-bare:latest zap.sh -cmd -quickurl app:8000/users/1000/userinfo > ZAP.xml'
+                sh 'docker run --rm -t --net=ci-dev --hostname zap --name zap owasp/zap2docker-bare:latest zap.sh -cmd -quickurl app:8000/users/1000/userinfo > ZAP.xml'
                 sh 'sed -i 1,12d ZAP.xml'
                 archiveArtifacts artifacts: 'ZAP.xml'
                 sh 'docker stop app'
