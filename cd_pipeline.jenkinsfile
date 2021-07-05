@@ -25,7 +25,7 @@ pipeline {
 
         stage('Application Deploy') {
             steps {
-                sh 'docker run --rm -d -p 8000:8080 --name Spring_Boot_App yeskay16/devsecopsapp:$CI_BUILD_NUMBER'
+                sh 'docker run --rm --net=ci-dev -d -p 8000:8080 --hostname app --name app yeskay16/devsecopsapp:$CI_BUILD_NUMBER'
             }
         }
 
@@ -33,9 +33,23 @@ pipeline {
             steps {
                 sleep(10);
                 sh 'curl -s -o /dev/null -w "%{http_code}" localhost:8000/users/1000/userinfo || echo "API FAILURE: Status Code is not 200 OK!"'
-                sh 'docker stop Spring_Boot_App'
-                sh 'docker rmi -f yeskay16/devsecopsapp:$CI_BUILD_NUMBER'
             }
         }
+    
+        stage('OWASP ZAP Scan') { 
+            steps {
+                sh 'docker run --rm -ti --net=ci-dev --hostname zap --name zap owasp/zap2docker-bare:latest zap.sh -cmd -quickurl app:8000/users/1000/userinfo > ZAP.xml'
+                sh 'sed -i 1,12d ZAP.xml'
+            }
+        }
+
+        post {
+            always {
+                sh 'docker stop app'
+                sh 'docker rmi -f yeskay16/devsecopsapp:$CI_BUILD_NUMBER'
+                archiveArtifacts artifacts: 'ZAP.xml'
+            }
+        }
+        
     }
 }
