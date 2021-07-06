@@ -40,9 +40,7 @@ pipeline {
             steps {
                 sh 'docker run --rm -t --net=ci-dev --hostname zap --name zap owasp/zap2docker-bare:latest zap.sh -cmd -quickurl http://app:8080/users/1000/userinfo > ZAP.xml'
                 sh 'sed -i 1,11d ZAP.xml'
-                archiveArtifacts artifacts: 'ZAP.xml'
-                //sh 'if [[ 1 < $(grep -o -i "<riskcode>2</riskcode>" report.xml | wc -l) ]]; then echo "Medium Risk"; fi;'
-                
+                archiveArtifacts artifacts: 'ZAP.xml'                
                 script {
                     ZAP_LOW = sh (script: 'grep -o -i "<riskcode>1</riskcode>" ZAP.xml | wc -l', returnStdout: true).trim().toInteger()
                     ZAP_MEDIUM = sh (script: 'grep -o -i "<riskcode>2</riskcode>" ZAP.xml | wc -l', returnStdout: true).trim().toInteger()
