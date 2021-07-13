@@ -20,7 +20,8 @@ pipeline {
             steps {
                 // sh "trivy image --exit-code 1 --severity CRITICAL pkuma343/myimage:${env.BUILD_NUMBER}"		
                 //sh "trivy image --exit-code 0 yeskay16/devsecopsapp:$CI_BUILD_NUMBER"
-                sh 'trivy image --format template --template "{{ range . }} {{ .Target }} {{ end }}" yeskay16/devsecopsapp:$CI_BUILD_NUMBER'
+                //sh 'trivy image --format template --template "{{ range . }} {{ .Target }} {{ end }}" yeskay16/devsecopsapp:$CI_BUILD_NUMBER'
+                sh "trivy image -f json -o results.json --exit-code 0 yeskay16/devsecopsapp:$CI_BUILD_NUMBER"
             }
         }
 
