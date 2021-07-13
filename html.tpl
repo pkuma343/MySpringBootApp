@@ -9,6 +9,7 @@
       }
       h1 {
         text-align: center;
+        color: #8cf986;
       }
       .group-header th {
         font-size: 200%;
@@ -81,7 +82,7 @@
       };
     </script>
   </head>
-  <body>
+  <body style="background-color:#000080;">
     <h1>{{- escapeXML ( index . 0 ).Target }} - Trivy Report - {{ getCurrentTime }}</h1>
     <table>
     {{- range . }}
