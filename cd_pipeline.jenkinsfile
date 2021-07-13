@@ -20,7 +20,7 @@ pipeline {
             steps {
                 // sh "trivy image --exit-code 1 --severity CRITICAL pkuma343/myimage:${env.BUILD_NUMBER}"		
                 //sh "trivy image --exit-code 0 yeskay16/devsecopsapp:$CI_BUILD_NUMBER"
-                sh "trivy image --format template --template '{{- $critical := 0 }}{{- $high := 0 }}{{- range . }}{{- range .Vulnerabilities }}{{- if  eq .Severity "CRITICAL" }}{{- $critical = add $critical 1 }}{{- end }}{{- if  eq .Severity "HIGH" }}{{- $high = add $high 1 }}{{- end }}{{- end }}{{- end }},Critical: {{ $critical }}, High: {{ $high }}' yeskay16/devsecopsapp:$CI_BUILD_NUMBER"
+                sh "trivy image --format template --template '{{- $critical := 0 }}{{- $high := 0 }}{{- range . }}{{- range .Vulnerabilities }}{{- if  eq .Severity "CRITICAL" }}{{- $critical = add $critical 1 }}{{- end }}{{- if  eq .Severity "HIGH" }}{{- $high = add $high 1 }}{{- end }}{{- end }}{{- end }}' yeskay16/devsecopsapp:$CI_BUILD_NUMBER"
             }
         }
 
